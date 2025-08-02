@@ -7,7 +7,7 @@
 function computerPlay() {
   const choices = ["Rock", "Paper", "Scissors"];
   const randomIndex = Math.floor(Math.random() * choices.length);
-  return choices[randomIndex]; // Returns either 'Rock', 'Paper' or 'Scissors'
+  return choices[randomIndex];
 }
 
 /**
@@ -37,17 +37,19 @@ function playRound(playerSelection, computerSelection) {
   }
 }
 
-/**
- * Prompts the user for their choice and validates it.
- * @returns {string|null} The validated player's choice, or null if cancelled.
- */
 function getPlayerChoice() {
+  const validChoices = {
+    'r': 'Rock', 'rock': 'Rock',
+    'p': 'Paper', 'paper': 'Paper', 
+    's': 'Scissors', 'scissors': 'Scissors', 'scissor': 'Scissors'
+  };
+
   let choiceInput;
   let isValidChoice = false;
 
   while (!isValidChoice) {
     choiceInput = prompt(
-      "Evil Al: Choose your weapon! Rock, Paper, or Scissors?"
+      "Evil Al: Choose your weapon! Rock, Paper, or Scissors? (or just r/p/s)"
     );
 
     if (choiceInput === null) {
@@ -59,19 +61,21 @@ function getPlayerChoice() {
 
     const trimmedChoice = choiceInput.trim().toLowerCase();
 
-    if (
-      trimmedChoice === "rock" ||
-      trimmedChoice === "paper" ||
-      trimmedChoice === "scissors"
-    ) {
+    if (validChoices[trimmedChoice]) {
       isValidChoice = true;
-      return trimmedChoice.charAt(0).toUpperCase() + trimmedChoice.slice(1);
+      return validChoices[trimmedChoice];
     } else {
       console.log(
-        "Evil Al: Invalid choice! You must choose 'Rock', 'Paper', or 'Scissors'."
+        "Evil Al: Invalid choice! You must choose 'Rock', 'Paper', 'Scissors', or just 'r', 'p', 's'."
       );
     }
   }
+}
+
+function askPlayAgain() {
+  const playAgain = prompt("Would you like to play again? (yes/no)");
+  if (playAgain === null) return false;
+  return playAgain.toLowerCase().trim().startsWith('y');
 }
 
 // --- Main Game Logic ---
@@ -112,24 +116,14 @@ function game() {
 
     if (roundResult.includes("You Win!")) {
       playerScore++;
-      currentRound++;
-      console.log(
-        `Player Score: ${playerScore}, Evil Al Score: ${computerScore}`
-      );
     } else if (roundResult.includes("You Lose!")) {
       computerScore++;
-      currentRound++;
-      console.log(
-        `Player Score: ${playerScore}, Evil Al Score: ${computerScore}`
-      );
-    } else {
-      console.log(
-        "Evil Al: A tie! This round doesn't count, you need to win to stop me!"
-      );
-      console.log(
-        `Player Score: ${playerScore}, Evil Al Score: ${computerScore}`
-      );
     }
+
+    currentRound++;
+    console.log(
+      `Player Score: ${playerScore}, Evil Al Score: ${computerScore}`
+    );
   }
 
   console.log("\n--- Game Over ---");
@@ -159,5 +153,19 @@ function game() {
   console.log("Thank you for playing!");
 }
 
-// Start the game
-game();
+function startGame() {
+  let playingGame = true;
+  
+  while (playingGame) {
+    game();
+    playingGame = askPlayAgain();
+    
+    if (playingGame) {
+      console.log("\nEvil Al: So you dare challenge me again? EXCELLENT!");
+    } else {
+      console.log("\nEvil Al: Until we meet again... MWAHAHAHA!");
+    }
+  }
+}
+
+startGame();
